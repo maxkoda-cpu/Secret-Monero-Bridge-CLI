@@ -9,6 +9,7 @@ const liverecip = "secret14m2pfpe20fsw7f0anctgyyzhhmk6mz69wpkdqa";
 const xmrEmailTx = "frpergzbareb@v2cznvy.bet";
 const xmrEmail = "fzo@v2cznvy.bet";
 const minAmount = 0.0075;
+const version = ""
 
 const debug = false;
 
@@ -16,6 +17,9 @@ const debug = false;
 
 
 var argv = require('yargs/yargs')(process.argv.slice(2))
+    .alias('v', 'version')
+    .version(true, "1.0-beta1")
+    // .describe('v', 'show version information')
     .usage('Usage: $0 <command> [options]')
     .command('d', 'Enter a Deposit', function (yargs) {
         argv = yargs
@@ -242,7 +246,7 @@ if (command === "d") {
         console.log("** Bad Monero Wallet Address (-m) **");
         proceed = false;
     }
-    if (isNaN(argv.amount)){
+    if (isNaN(argv.amount)) {
         console.log("** Bad Amount **")
         proceed = false;
     }
@@ -257,7 +261,7 @@ if (command === "d") {
         let amount = parseFloat(argv.amount);
         amount *= 1000000000000;
         amount = Math.floor(amount);
-        
+
         const cmd = `secretcli tx compute execute secret19ungtd2c7srftqdwgq0dspwvrw63dhu79qxv88 '{"transfer": {"recipient": "${debug ? debugRecip : liverecip}", "amount": "${amount}", "memo":"${memo}"}}' --from ${argv.secretwalletaddress} --gas 300000 -y`
         const rl = readline.createInterface({
             input: process.stdin,
@@ -269,7 +273,7 @@ if (command === "d") {
                     input: process.stdin,
                     output: process.stdout
                 });
-                
+
 
                 exec(cmd, (error, stdout, stderr) => {
                     if (error) {
@@ -285,9 +289,9 @@ if (command === "d") {
                     const match2 = stdout.match(/txhash:\s(.*)/);
                     let txHash;
 
-                    if (match1 && match1.length>0){
+                    if (match1 && match1.length > 0) {
                         txHash = match1[1];
-                    }else if (match2 && match2.length>0){
+                    } else if (match2 && match2.length > 0) {
                         txHash = match2[1];
                     }
 
@@ -350,7 +354,7 @@ if (command === "d") {
                 });
 
 
-            }else if (response.toLowerCase()==="n"){
+            } else if (response.toLowerCase() === "n") {
                 console.log("Withdrawal Aborted")
             }
             rl.close();
