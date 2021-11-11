@@ -10,6 +10,9 @@ You will need to have the secretcli (version 1.2.0) installed on your machine to
 
 You will need Node.js (https://nodejs.org/) v10+ to build.
 
+Binaries (with SHA256 verifiable hashes) are available under releases.
+
+
 **Usage (Linux):**
 
 version - reports the application version:
