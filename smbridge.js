@@ -1,25 +1,172 @@
+const util = require('util');
 const { exec } = require("child_process");
+const exec2 = util.promisify(exec)
+
 const atob = require('atob');
 const { Crypto } = require("@peculiar/webcrypto");
 const readline = require("readline");
 const crypto = new Crypto();
+const fetch = require("node-fetch")
 
 const debugRecip = "secret1f48rsx497tvsgm683cr3kwd38kaaumrncpju0d";
 const liverecip = "secret14m2pfpe20fsw7f0anctgyyzhhmk6mz69wpkdqa";
 const xmrEmailTx = "frpergzbareb@v2cznvy.bet";
 const xmrEmail = "fzo@v2cznvy.bet";
-const minAmount = 0.0075;
-const version = ""
+const AbortController = require("abort-controller");
+const { exit } = require("process");
 
 const debug = false;
+let minAmount;
 
-//node smbridge.js w -w secret1727hjj8nxkk42gdwnlukqmy57xmfchl65k4y2k -a 0.01 -m A1uQozhKQbP79i8nXEr99pFcRNf3gvvNHfWfX9K8LY6KALJjFsVEgmqg1vjBtfN9siAmgzqk52mzJATANfS75W2u6GxuFrF
+const lookupFee = async () => {
+    const controller = new AbortController();
+    const timeout = setTimeout(
+        () => { controller.abort(); },
+        10000,
+    );
+    try {
+        const masterJsonResult = await fetch('https://ipfs.io/ipns/k51qzi5uqu5dhbw8rdb2izuyemvqmzj12omml9xun0pu58csozinpbvtw7h3f1/master.json')
+            .then(res => res.json())
+            .then(data => {
+                return data;
+            },
+                err => {
+                    if (err.name === 'AbortError') {
+                        throw new Error("Fee lookup aborted")
+                    }
+                });
+        return masterJsonResult.fee
+    } catch (error) {
+        return error.message;
+    }
+}
+
+const sleep = (ms) => {
+    return new Promise((resolve) => {
+        setTimeout(resolve, ms);
+    });
+}
+const verifyWithdrawal2 = async (txHash) => {
+    return new Promise(async (resolve, reject) => {
+        const cmd = `secretcli q compute tx ${txHash}`
+        let ret = {success:false};
+        for (let x = 0; x < 10; x++) {
+            // console.log("iteration", x);
+            await sleep(2000)
+            try {
+                const { error, stdout, stderr } = await exec2(cmd);
+                if (error) {
+                    console.log("error", error);
+                    ret = { success: false, error: error.message };
+                }
+                if (stderr) {
+                    console.log("stderr", stderr);
+                    ret = { success: false, error: stderr };
+                }
+                if (!error && !stderr && stdout) {
+                    try {
+                        //id config output is in json mode try to parse it
+                        //if that fails they are in text mode
+                        const jsonVerification = JSON.parse(stdout)
+                        const transferProp = JSON.parse(jsonVerification.output_data_as_string);
+                        const status = transferProp.transfer.status;
+                        if (status === "success") {
+                            ret = { success: true }
+                            break;
+                        } else {
+                            ret = { success: false }
+                        }
+                    } catch (error) {
+                        //in output text mode
+                        // const match1 = stdout.match(/"transfer"\S?:\S?"status"\S?:\S?"(.*)"/);
+                        if (stdout.indexOf("success")!== -1){
+                            ret = { success: true }
+                            break;
+                        } else {
+                            ret = { success: false, error: "Could not verify Transaction" }
+                        }
+                    }
+                }
+            } catch (error) {
+                ret = { success: false, error: "Could not verify Transaction" }
+            }
+        }
+        if (ret.success) {
+            resolve(ret);
+        } else {
+            reject(ret);
+        }
+
+    });
+}
+
+const verifyWithdrawal = async (txHash) => {
+    return new Promise((resolve, reject) => {
+        let trycount = 0;
+        let intId = setInterval(() => {
+            trycount++
+            const cmd = `secretcli q compute tx ${txHash}`
+            console.log(`<<DEBUG -- CMD = ${cmd} >>`)
+            exec(cmd, (error, stdout, stderr) => {
+
+                if (error) {
+                    if (trycount > 3) {
+                        clearInterval(intId)
+                        reject({ success: false, error: error.message });
+                    }
+                }
+                if (stderr) {
+                    if (trycount > 3) {
+                        clearInterval(intId)
+                        reject({ success: false, error: stderr });
+                    }
+                }
+
+                try {
+                    //id config output is in json mode try to parse it
+                    //if that fails they are in text mode
+                    const jsonVerification = JSON.parse(stdout)
+                    const transferProp = JSON.parse(jsonVerification.output_data_as_string);
+                    const status = transferProp.transfer.status;
+                    if (status === "success") {
+                        clearInterval(intId);
+                        resolve({ success: true })
+                    }
+                    if (trycount > 3) {
+                        clearInterval(intId)
+                        reject(status)
+                    }
+
+                } catch (error) {
+                    //in text mode
+                    const match1 = stdout.match(/"transfer"\S?:\S?"status"\S?:\S?"(.*)"/);
+                    if (match1 && match1.length > 0) {
+                        console.log(`<<DEBUG -- status = ${match1[1]} >>`)
+                        if (match1[1] === "success") {
+                            clearInterval(intId);
+                            resolve({ success: true });
+                        }
+                    }
+                    if (trycount > 3) {
+                        clearInterval(intId)
+                        reject({ success: false, error: "Could not verify Transaction" });
+                    }
+
+                }
+            });
+        }, 2000)
+
+    })
+}
+
+
+
+
 
 
 var argv = require('yargs/yargs')(process.argv.slice(2))
     .alias('v', 'version')
-    .version(true, "1.0-beta1")
-    // .describe('v', 'show version information')
+    .version(true, "1.0-beta2")
     .usage('Usage: $0 <command> [options]')
     .command('d', 'Enter a Deposit', function (yargs) {
         argv = yargs
@@ -65,12 +212,15 @@ var argv = require('yargs/yargs')(process.argv.slice(2))
             .describe('m', 'monero wallet address')
             .demandOption(['m'])
     })
+    .command('f', 'Lookup current fee', function (yargs) {
+        argv = yargs
+            .example('$0 f', 'Lookup current fee')
+            .help("h")
+    })
     .demandCommand()
     .help('h')
     .alias('h', 'help')
     .argv;
-
-//secretcli tx compute execute address: secret19ungtd2c7srftqdwgq0dspwvrw63dhu79qxv88 '{"transfer": {"recipient": "secret14m2pfpe20fsw7f0anctgyyzhhmk6mz69wpkdqa", "amount": "10000000000"}}' --from secret1727hjj8nxkk42gdwnlukqmy57xmfchl65k4y2k
 
 const emailEncrypt = (message) => {
     if (message) {
@@ -79,7 +229,6 @@ const emailEncrypt = (message) => {
         return "";
     }
 }
-
 
 const encryptMessage = async (msg, doDecrypt) => {
     var str2ab = function (str) {
@@ -218,6 +367,7 @@ if (command === "d") {
                 console.log("")
                 console.log("------------------------------------------------------")
                 console.log("")
+                // process.exit(1)
             })
             .catch(error => {
                 console.log("")
@@ -237,131 +387,180 @@ if (command === "d") {
     }
 
 } else if (command === "w") {
-    let proceed = true;
-    if (!/^\S{45}$/.test(argv.secretwalletaddress)) {
-        console.log("** Bad Secret Wallet Address (-w) **");
-        proceed = false;
-    }
-    if (!/^\S{95}$/.test(argv.monerowalletaddress)) {
-        console.log("** Bad Monero Wallet Address (-m) **");
-        proceed = false;
-    }
-    if (isNaN(argv.amount)) {
-        console.log("** Bad Amount **")
-        proceed = false;
-    }
-    if (proceed && parseFloat(argv.amount) <= minAmount) {
-        console.log(`** Bad Amount (-a) must be greater than ${minAmount}**`);
-        proceed = false;
-    }
+    lookupFee()
+        .then(data => {
+            minAmount = data;
+            let proceed = true;
+            const getminAmount = () => {
 
-    if (proceed) {
-        const utc_timestamp = Date.now();
-        const memo = utc_timestamp.toString();
-        let amount = parseFloat(argv.amount);
-        amount *= 1000000000000;
-        amount = Math.floor(amount);
+            }
+            if (!/^\S{45}$/.test(argv.secretwalletaddress)) {
+                console.log("** Bad Secret Wallet Address (-w) **");
+                proceed = false;
+            }
+            if (!/^\S{95}$/.test(argv.monerowalletaddress)) {
+                console.log("** Bad Monero Wallet Address (-m) **");
+                proceed = false;
+            }
+            if (isNaN(argv.amount)) {
+                console.log("** Bad Amount **")
+                proceed = false;
+            }
+            if (proceed && parseFloat(argv.amount) <= minAmount) {
+                console.log(`** Bad Amount (-a) must be greater than ${minAmount}**`);
+                proceed = false;
+            }
 
-        const cmd = `secretcli tx compute execute secret19ungtd2c7srftqdwgq0dspwvrw63dhu79qxv88 '{"transfer": {"recipient": "${debug ? debugRecip : liverecip}", "amount": "${amount}", "memo":"${memo}"}}' --from ${argv.secretwalletaddress} --gas 300000 -y`
-        const rl = readline.createInterface({
-            input: process.stdin,
-            output: process.stdout
-        });
-        rl.question(`Confirm amount: ${argv.amount} = ${amount} atomic units, (Y/n) `, async function (response) {
-            if (response.toLowerCase() === "y") {
+            if (proceed) {
+                const utc_timestamp = Date.now();
+                const memo = utc_timestamp.toString();
+                let amount = parseFloat(argv.amount);
+                amount *= 1000000000000;
+                amount = Math.floor(amount);
+
+                const cmd = `secretcli tx compute execute secret19ungtd2c7srftqdwgq0dspwvrw63dhu79qxv88 '{"transfer": {"recipient": "${debug ? debugRecip : liverecip}", "amount": "${amount}", "memo":"${memo}"}}' --from ${argv.secretwalletaddress} --gas 300000 -y`
                 const rl = readline.createInterface({
                     input: process.stdin,
                     output: process.stdout
                 });
+                rl.question(`Confirm amount: ${argv.amount} = ${amount} atomic units, current Fee is ${minAmount} (Y/n) `, async function (response) {
+                    if (response.toLowerCase() === "y") {
+                        const rl = readline.createInterface({
+                            input: process.stdin,
+                            output: process.stdout
+                        });
+
+                        exec(cmd, async (error, stdout, stderr) => {
+                            if (error) {
+                                console.log(`Error: ${error.message}`);
+                                return;
+                            }
+                            if (stderr) {
+                                console.log(`Error: ${stderr}`);
+                                return;
+                            }
+
+                            console.log("*** INFORMATIONAL ONLY SecretCLI CMD ECHO---------->")
+                            console.log(stdout)
+                            console.log("<---------- END CMD ECHO - INFORMATIONAL ONLY ***")
+                            console.log("")
+                            console.log("")
+                            // const match1 = stdout.match(/txhash\"?:\s\"?(.*)\"/);
+                            // const match2 = stdout.match(/txhash:\s(.*)/);
+                            const matchHash = stdout.match(/"txhash":"(.*?)"|txhash\\"?:\s?\\"?(.*)\\"/)
+                            let txHash;
+
+                            if (matchHash && matchHash.length>0){
+                                txHash = matchHash[1];
+                            }
+
+                            if (stdout && txHash) {
+                                //First verify the txhash before creating the encrypted email message
+                                try {
+                                    const verifiedResponse = await verifyWithdrawal2(txHash);
+                                    if (!verifiedResponse.success) {
+                                        console.log(`
+                                            *** NOTE: Could not automatically verify transaction ***
+                                        `)
+                                    }
+                                } catch (error) {
+                                    console.log(`
+                                    *** NOTE: Could not automatically verify transaction ***
+                                    `)
+                                }
 
 
-                exec(cmd, (error, stdout, stderr) => {
-                    if (error) {
-                        console.log(`Error: ${error.message}`);
-                        return;
-                    }
-                    if (stderr) {
-                        console.log(`Error: ${stderr}`);
-                        return;
-                    }
+                                encryptMessage(JSON.stringify({
+                                    sender: argv.secretwalletaddress,
+                                    amount: amount,
+                                    memo: memo,
+                                    walletAddress: argv.secretwalletaddress,
+                                    viewKey: "",
+                                    xmrWallet: argv.monerowalletaddress,
+                                    txhash: txHash || "None"
+                                }))
+                                    .then(encrypted => {
+                                        console.log(`
+            
+                                        ------------------------------------------------------
+                                        IMPORTANT -- ACTION REQUIRED TO COMPLETE TRANSACTION
+                    
+                                        Mail the content below
+                    
+                                        To: ${emailEncrypt(xmrEmailTx)}
+                                        Subject: Withdrawal Message
+                                        Message: startencrypteddata${encrypted}endencrypteddata
+                    
+                                        ------------------------------------------------------
+                                        `);
 
-                    const match1 = stdout.match(/txhash\"?:\s\"?(.*)\"/);
-                    const match2 = stdout.match(/txhash:\s(.*)/);
-                    let txHash;
 
-                    if (match1 && match1.length > 0) {
-                        txHash = match1[1];
-                    } else if (match2 && match2.length > 0) {
-                        txHash = match2[1];
-                    }
-
-                    if (stdout && txHash) {
-                        encryptMessage(JSON.stringify({
-                            sender: argv.secretwalletaddress,
-                            amount: amount,
-                            memo: memo,
-                            walletAddress: argv.secretwalletaddress,
-                            viewKey: "",
-                            xmrWallet: argv.monerowalletaddress,
-                            txhash: txHash || "None"
-                        }))
-                            .then(encrypted => {
-                                console.log(`
-                
-                                            ------------------------------------------------------
-                                            IMPORTANT
-                        
-                                            Mail the content below
-                        
-                                            To: ${emailEncrypt(xmrEmailTx)}
-                                            Subject: Withdrawal Message
-                                            Message: startencrypteddata${encrypted}endencrypteddata
-                        
-                                            ------------------------------------------------------
-                                            `);
-
-                            })
-                            .catch(error => {
-                                console.log(`
-                                    
-                                    ------------------------------------------------------
-                                    ERROR-FAILED TO CREATE WITHDRAWAL TRANSACTION
-                
-                                    Please try again or email the message below
-                
-                                    To: ${emailEncrypt(xmrEmail)}
-                                    Subject: CLI Withdrawal Error
-                                    Message: ${cmd}
-                                    
-                                    ${error}
-                                    ------------------------------------------------------
-                
-                                    `);
-                            })
-                    } else {
-                        console.log(`
+                                    })
+                                    .catch(error => {
+                                        console.log(`
                                 
                                 ------------------------------------------------------
                                 ERROR-FAILED TO CREATE WITHDRAWAL TRANSACTION
-                
-                                Please make sure the SecretCli is in your computers PATH and configured.
-                
-                                If you continue to have issues email Support at ${emailEncrypt(xmrEmail)}
-                                ------------------------------------------------------
-                
-                                `);
+            
+                                Please try again or email the message below
+            
+                                To: ${emailEncrypt(xmrEmail)}
+                                Subject: CLI Withdrawal Error
+                                Message: ${cmd}
+                                
+                                ${error}
+                                ------------------------------------------------------`);
+
+                                    })
+                            } else {
+                                console.log(`
+                            
+                            ------------------------------------------------------
+                            ERROR-FAILED TO CREATE WITHDRAWAL TRANSACTION
+            
+                            Please make sure the SecretCli is in your computers PATH and configured.
+            
+                            If you continue to have issues email Support at ${emailEncrypt(xmrEmail)}
+                            ------------------------------------------------------
+                            `);
+                            }
+                        });
+                    } else if (response.toLowerCase() === "n") {
+                        console.log("Withdrawal Aborted")
+                        process.exit(1)
                     }
+                    rl.close();
                 });
-
-
-            } else if (response.toLowerCase() === "n") {
-                console.log("Withdrawal Aborted")
+            } else {
+                process.exit(1);
             }
-            rl.close();
-        });
-
-
-    }
+        })
+        .catch(error => {
+            console.log(`Could not complete Current Fee Lookup.`);
+            process.exit(1)
+        })
+} else if (command === "f") {
+    lookupFee()
+        .then(async data => {
+            try {
+                minAmount = data;
+                console.log(minAmount);
+                process.exit(1)
+            } catch (error) {
+                console.log(`Could not complete Current Fee Lookup.`);
+                process.exit(1)
+            }
+        })
+        .catch(error => {
+            console.log(`Could not complete Current Fee Lookup.`);
+            process.exit(1)
+        })
 } else {
     console.log("Invalid Command");
+    process.exit(1)
 }
+
+
+
+
+
