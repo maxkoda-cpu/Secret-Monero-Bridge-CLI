@@ -26,7 +26,7 @@ bridge fee - reports the current bridge fee:
 
 deposit - make a deposit:
 
-  ./smbridge-linux d -t <txid> -k <txkey> -w <secret_wallet_address>
+  ./smbridge-linux d -t <monero_txid> -k <monero_txkey> -w <secret_wallet_address>
   
 withdrawal - make a withdrawal:
   
