@@ -12,23 +12,29 @@ You will need Node.js (https://nodejs.org/) v10+ to build.
 
 Binaries (with SHA256 verifiable hashes) are available under releases.
 
+*The Secret Monero Bridge wallet address is: 46KTmvCDx862ijymLsCDVaCZ5UNc2A6yNhYEBt4t6AkrLf5CpF7XuB8HjUffdAfcZRTnZD1f3JyeTixqSsdMW7Sd9x1odvN
+XMR deposits should be made to this address using the monero *
 
 **Usage (Linux):**
 
-version - reports the application version:
+**version - reports the application version:**
 
 ./smbridge-linux --version
 
 
-bridge fee - reports the current bridge fee:
+**bridge fee - reports the current bridge fee:**
 
   ./smbridge-linux f
 
-deposit - make a deposit:
+**deposit - make a deposit (submitting Monero Proof-of-Payment):**
 
-  ./smbridge-linux d -t <monero_txid> -k <monero_txkey> -w <secret_wallet_address>
+  ./smbridge-linux d -t <monero_txid> -k <monero_txkey> -w <secret_wallet_address_to_receive_sXMR>
   
-withdrawal - make a withdrawal:
+*(the Secret Monero Bridge wallet address is: 46KTmvCDx862ijymLsCDVaCZ5UNc2A6yNhYEBt4t6AkrLf5CpF7XuB8HjUffdAfcZRTnZD1f3JyeTixqSsdMW7Sd9x1odvN*
+
+*XMR deposits should be made to this address using the Monero wallet of your choice.)*
+
+**withdrawal - make a withdrawal:**
   
   ./smbridge-linux w -w <secret_wallet_address> -a <withdrawal_amount> -m <monero_wallet_address>
   
