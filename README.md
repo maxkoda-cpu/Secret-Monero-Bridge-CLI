@@ -6,7 +6,7 @@ Enables performing Secret Monero Bridge deposits and withdrawals via a command l
 
 **Dependencies:**
 
-You will need to have the secretcli (version 1.2.0) installed on your machine to run the CLI (see https://docs.scrt.network/node-guides/secretcli.html#secret-network-light-client )
+You will need to have the secretcli (version 1.2.0) installed on your machine to run the CLI (see https://build.scrt.network/light-client-mainnet.html )
 
 You will need Node.js (https://nodejs.org/) v10+ to build.
 
