@@ -4,6 +4,9 @@ Secret Monero Bridge Command Line Interface (CLI) - version 1.0-beta2
 
 Enables performing Secret Monero Bridge deposits and withdrawals via a command line interface instead of the web based Dapp and the Keplr wallet extension.
 
+**Installation Video**
+https://ipfs.io/ipfs/bafybeigy2uis6tzmsgmdp4b6fx57dyrm7x5xd7txy33ae33yngemyocwne/Secret-Monero-Bridge-CLI.m4v
+
 **Dependencies:**
 
 You will need to have the secretcli (version 1.2.0+) installed on your machine to run the CLI (see https://build.scrt.network/light-client-mainnet.html )
