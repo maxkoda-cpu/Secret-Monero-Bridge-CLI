@@ -16,6 +16,7 @@ Download all the files in this directory to your machine, then run:
 chmod +x install.sh
 
 chmod +x config.sh
+
 ./install.sh
 
 ./config.sh
