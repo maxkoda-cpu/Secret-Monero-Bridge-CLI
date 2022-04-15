@@ -10,7 +10,7 @@ The install.sh script performs the following:
 3. Installs and configures the caddy (reverse proxy)
 
 You must have your datahub authorization key prior to running install.sh. It will prompt you for your datahub authorization key
-to configure the caddy reverse proxy. 
+to configure the caddy reverse proxy. To signup and obtain a datahub authorization key go to:https://datahub.figment.io/signup
 
 The config.sh script is a real simple script to configure your secretcli with the correct chain-id and output format.
 
