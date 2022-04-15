@@ -21,3 +21,5 @@ sudo ./install.sh (You will be required to enter your datahub authentication key
 
 ./config.sh
 
+Video:
+https://ipfs.io/ipfs/bafybeidmkswcucjyspgsuxut6a3dj5go5l7odqmaljnsz2twa6dt4rhh6y/install2-2022-04-15_14.50.41.m4v
