@@ -17,7 +17,7 @@ chmod +x install.sh
 
 chmod +x config.sh
 
-./install.sh
+./install.sh (You will be required to enter your datahub authentication key in this step)
 
 ./config.sh
 
