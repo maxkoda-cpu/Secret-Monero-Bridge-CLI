@@ -11,6 +11,8 @@ https://ipfs.io/ipfs/bafybeigy2uis6tzmsgmdp4b6fx57dyrm7x5xd7txy33ae33yngemyocwne
 
 You will need to have the secretcli (version 1.2.0+) installed on your machine to run the CLI (see https://build.scrt.network/light-client-mainnet.html )
 
+You will need an active key (wallet account) installed for use in the secretcli.
+
 You will need Node.js (https://nodejs.org/) v10+ to build.
 
 Binaries (with SHA256 verifiable hashes) are available under releases.
