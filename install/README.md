@@ -47,3 +47,6 @@ To verify that your key was installed properly.
   
 
 (You can obtain your accounts mnemonic seed by going to the account list in Keplr, and selecting the "View Mnemonic Seed" option from the hamburger menu. You will need to enter your password in Keplr to view the mnemonic seed).
+  
+  **Secretcli Client Usage:**
+  https://docs.scrt.network/cli/secretcli.html#keys
