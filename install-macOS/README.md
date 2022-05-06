@@ -1,6 +1,6 @@
 **macOS Installation**
 
-**Dependencies**
+**Dependencies:**
 
 You will need to install Homebrew:
 
