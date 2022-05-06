@@ -1,6 +1,5 @@
 # Secret-Monero-Bridge-CLI
-Secret Monero Bridge Command Line Interface (CLI) - version 1.0-beta2
-(Supernova upgrade) 
+Secret Monero Bridge Command Line Interface (CLI) - version 1.0-beta3
 
 Enables performing Secret Monero Bridge deposits and withdrawals via a command line interface instead of the web based Dapp and the Keplr wallet extension.
 
@@ -20,6 +19,10 @@ Binaries (with SHA256 verifiable hashes) are available under releases.
 
 
 **Usage (Linux):**
+
+**help - provides help instructions**
+
+.smbridge-linux --help
 
 **version - reports the application version:**
 
@@ -42,5 +45,6 @@ Binaries (with SHA256 verifiable hashes) are available under releases.
   
   ./smbridge-linux w -w <secret_wallet_address> -a <withdrawal_amount> -m <monero_wallet_address>
   
-
+  Use the -p (--passphrase) option if your keyring requires a passphrase for access.
+  
 **This pre-release code is for broader testing purposes. Report any issues to smb@i2pmail.org**
