@@ -10,7 +10,7 @@ secretcli version
 
 
 #Download smbridge-linux...
-wget https://github.com/maxkoda-cpu/Secret-Monero-Bridge-CLI/releases/download/v1.0-beta2/smbridge-linux
+wget https://github.com/maxkoda-cpu/Secret-Monero-Bridge-CLI/releases/download/v1.0-beta3/smbridge-linux
 chmod +x smbridge-linux
 mv smbridge-linux /usr/bin/
 smbridge-linux --version
