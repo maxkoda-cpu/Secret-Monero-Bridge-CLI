@@ -1,1 +1,1 @@
-**macOS installation**
+**macOS Installation**
