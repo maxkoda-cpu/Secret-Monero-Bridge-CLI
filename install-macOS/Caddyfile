@@ -1,0 +1,7 @@
+http://localhost:1234
+ 
+reverse_proxy {
+        to https://secret-4--rpc--full.datahub.figment.io
+        header_up Authorization <AUTH_CODE>
+        header_up Host secret-4--rpc--full.datahub.figment.io
+}
