@@ -27,3 +27,5 @@ The install.sh script performs the following:
 -Installs caddy
 
 -Configures caddy for use with datahub
+
+The config.sh file simply specifies the chain-id and output settings for secretcli.
