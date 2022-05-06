@@ -10,6 +10,14 @@ Once Homebrew is installed, install wget:
 
 brew install wget
 
+Then run the install script:
+
+./install.sh
+
+Then configure:
+
+./config.sh
+
 The install.sh script performs the following:
 
 -Installs secretcli
