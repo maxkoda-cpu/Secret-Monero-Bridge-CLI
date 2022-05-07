@@ -13,9 +13,8 @@
     "@peculiar/webcrypto": "^1.1.7",
     "abort-controller": "^3.0.0",
     "atob": "^2.1.2",
-    "node-fetch": "^2.6.5",
+    "node-fetch": "^2.6.7",
     "node-rsa": "^1.1.1",
-    "pkg": "^5.3.1",
-    "yargs": "^17.1.1"
+    "yargs": "^17.4.1"
   }
 }
