@@ -25,6 +25,26 @@ sudo ./install.sh
 
 You will need to specify an RPC node (secretcli config node <URL> ) so that the Secret Monero Bridge CLI can connect to the Secret Network.
 
+As of 29 May 2022, we are aware of the following public nodes:
+
+Trivium's:
+https://api.trivium.network/ (this is a website, you will find endpoints there, mainnet and testnet)
+
+Ronin Ventures':
+RPC:
+https://rpc.roninventures.io/
+https://testnet-rpc.roninventures.io/
+
+gRPC-Web:
+https://web-rpc.roninventures.io/
+https://testnet-web-rpc.roninventures.io/
+
+
+Community API:
+LCD/REST: https://api.scrt.network/
+RPC coming soon 
+
+
 To perform deposits/withdrawals, you will need to have installed your key for the account (wallet) you plan to use with the Secret Monero Bridge CLI.
 You can view your list of secretcli installed keys by issuing the command:
 
