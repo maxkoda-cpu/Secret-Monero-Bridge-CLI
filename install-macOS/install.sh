@@ -20,13 +20,14 @@ chmod +x smbridge-macos
 mv smbridge-macos /usr/local/bin/
 smbridge-macos --version
 
-brew install caddy
+#datahub caddy usage discontinued - 29 May 2022
+#brew install caddy
 
-echo Enter datahub AUTH KEY:
-read auth
+#echo Enter datahub AUTH KEY:
+#read auth
 echo $auth
 
-str='s/<AUTH_CODE>/'$auth'/'
+#str='s/<AUTH_CODE>/'$auth'/'
 #echo $str
 
-sed -i '' $str Caddyfile
+#sed -i '' $str Caddyfile
