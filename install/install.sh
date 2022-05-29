@@ -15,14 +15,16 @@ chmod +x smbridge-linux
 mv smbridge-linux /usr/bin/
 smbridge-linux --version
 
+#datahub caddy support removed (May 29, 2022)
 
-echo Enter datahub AUTH KEY:
-read auth
-echo $auth
 
-str='s/<AUTH_CODE>/'$auth'/'
+#echo Enter datahub AUTH KEY:
+#read auth
+#echo $auth
+
+#str='s/<AUTH_CODE>/'$auth'/'
 #echo $str
 
-sed -i $str caddy-install.sh
-chmod +x caddy-install.sh
-./caddy-install.sh
+#sed -i $str caddy-install.sh
+#chmod +x caddy-install.sh
+#./caddy-install.sh
