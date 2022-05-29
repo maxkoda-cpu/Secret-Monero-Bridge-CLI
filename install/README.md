@@ -23,6 +23,8 @@ sudo ./install.sh
 
 **Note**
 
+You will need to specify an RPC node (secretcli config node <URL> ) so that the Secret Monero Bridge CLI can connect to the Secret Network.
+
 To perform deposits/withdrawals, you will need to have installed your key for the account (wallet) you plan to use with the Secret Monero Bridge CLI.
 You can view your list of secretcli installed keys by issuing the command:
 
