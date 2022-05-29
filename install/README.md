@@ -7,10 +7,7 @@ The install.sh script performs the following:
 
 1. Installs secretcli
 2. Installs smbridge-linux (Secret Monero Bridge CLI application)
-3. Installs and configures the caddy (reverse proxy)
 
-You must have your datahub authorization key prior to running install.sh. It will prompt you for your datahub authorization key
-to configure the caddy reverse proxy. To signup and obtain a datahub authorization key go to:https://datahub.figment.io/signup
 
 The config.sh script is a real simple script to configure your secretcli with the correct chain-id and output format.
 
@@ -20,7 +17,7 @@ chmod +x install.sh
 
 chmod +x config.sh
 
-sudo ./install.sh (You will be required to enter your datahub authentication key in this step)
+sudo ./install.sh 
 
 ./config.sh
 
