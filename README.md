@@ -37,7 +37,7 @@ Binaries (with SHA256 verifiable hashes) are available under releases.
 
   ./smbridge-linux d -t <monero_txid> -k <monero_txkey> -w <secret_wallet_address_to_receive_sXMR>
   
-*(the Secret Monero Bridge wallet address is: 46KTmvCDx862ijymLsCDVaCZ5UNc2A6yNhYEBt4t6AkrLf5CpF7XuB8HjUffdAfcZRTnZD1f3JyeTixqSsdMW7Sd9x1odvN*
+*(the Secret Monero Bridge wallet address is: 492mjoMwHzZL2hGZgh8XU65Peyi7CE996iGhm8Ja74fhR2XC3LrGCSdGcBBqtx9ccwCLtrZjGoHNx9kiR7d2nhoAAG84Nqe*
 
 *XMR deposits should be made to this address using the Monero wallet of your choice.)*
 
